@@ -14,3 +14,7 @@ use App\Http\Controllers\StudentController;
 */
 
 Route::get('/test', [StudentController::class, 'index']);
+
+Route::post('/addStudent', [StudentController::class, 'store']);
+Route::put('/editStudent/{id}/', [StudentController::class, 'update']);
+Route::delete('/deleteStudent/{id}/', [StudentController::class, 'destroy']);

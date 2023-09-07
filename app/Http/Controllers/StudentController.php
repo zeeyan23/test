@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\testModel;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
 {
@@ -38,7 +39,22 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->json()->all();
+
+        $testModel = new testModel();
+
+        if (isset($data['text'])) {
+            $testModel->firstname = $data['text']; // Assign the value from the request data
+        } else {
+            return response()->json(['message' => 'Missing "text" data'], 400);
+            // Return a 400 Bad Request response if 'text' is missing
+        }
+
+        if ($testModel->save()) {
+            return response()->json(['message' => 'Data saved successfully'], 201);
+        } else {
+            return response()->json(['message' => 'Failed to save data'], 500);
+        }
     }
 
     /**
@@ -60,7 +76,11 @@ class StudentController extends Controller
      */
     public function edit($id)
     {
-        //
+        return response()->json([
+            
+            'success' => true,
+            'message' => 'Student record updated successfully.',
+        ]);
     }
 
     /**
@@ -72,7 +92,16 @@ class StudentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validatedData = $request->validate([
+            'firstname' => 'required|string|max:255',
+        ]);
+    
+        $student = testModel::findOrFail($id);
+    
+        $student->update([
+            'firstname' => $validatedData['firstname'],
+        ]);
+        return response()->json(['message' => 'Student updated successfully.'], 200);
     }
 
     /**
@@ -83,6 +112,16 @@ class StudentController extends Controller
      */
     public function destroy($id)
     {
-        //
+        
+        $testModel = testModel::find($id);
+
+        if (!$testModel) {
+            return response()->json(['message' => 'Model not found'], 404);
+        }else{
+            $testModel->delete();
+        }
+        
+        return response()->json(['message' => 'Data deleted successfully'], 200);
     }
+
 }
